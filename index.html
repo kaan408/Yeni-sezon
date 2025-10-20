@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sezon Sayaçı — 2025-10-20 23:59</title>
+<style>
+  :root{
+    --bg:#0f0f14;
+    --card:#13131a;
+    --accent:#ff416c;
+    --accent2:#8a2be2;
+    --muted:#b8bcc4;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:
+    radial-gradient(1200px 600px at 10% 20%, rgba(138,43,226,0.08), transparent 10%),
+    radial-gradient(900px 400px at 90% 80%, rgba(255,65,108,0.06), transparent 10%),
+    var(--bg); color:#e6e9ef}
+  .wrap{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px;
+  }
+  .card{
+    width:980px; max-width:95%; padding:28px; border-radius:18px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow: 0 10px 40px rgba(2,6,23,0.7); border: 1px solid rgba(255,255,255,0.03);
+    display:grid; grid-template-columns: 1fr 360px; gap:22px; align-items:center;
+  }
+
+  /* Left: big countdown */
+  .left{
+    padding:18px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    border-radius:12px; min-height:260px;
+  }
+  h1{margin:0 0 6px 0; font-size:36px; letter-spacing:1px; color:var(--accent);}
+  p.lead{margin:0 0 18px 0; color:var(--muted)}
+  .target{
+    font-size:14px; color:var(--muted); margin-bottom:14px;
+  }
+  .big-count{
+    display:flex; gap:12px; align-items:center;
+  }
+  .time-block{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:18px 14px; border-radius:12px; min-width:108px; text-align:center;
+    box-shadow: inset 0 -6px 24px rgba(0,0,0,0.25);
+  }
+  .time-block .num{font-size:44px; font-weight:700; color:#fff; letter-spacing:1px;}
+  .time-block .lbl{font-size:13px; color:var(--muted); margin-top:6px; text-transform:uppercase;}
+  .subline{margin-top:12px; color:var(--muted); font-size:13px}
+
+  /* Right: clocks + progress */
+  .right{
+    padding:18px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    border-radius:12px; min-height:260px; display:flex; flex-direction:column; gap:14px;
+  }
+  .clock{
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .digital{
+    font-family: 'Segoe UI', Roboto, sans-serif; font-weight:700; font-size:22px;
+    letter-spacing:1px;
+  }
+  .small-muted{color:var(--muted); font-size:13px}
+
+  .progress-wrap{padding:10px; background:var(--glass); border-radius:10px; border:1px solid rgba(255,255,255,0.03)}
+  .progress{
+    height:14px; background: rgba(255,255,255,0.04); border-radius:999px; overflow:hidden; position:relative;
+  }
+  .progress > i{
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    background: linear-gradient(90deg,var(--accent), var(--accent2, #8a2be2));
+    box-shadow: 0 6px 18px rgba(138,43,226,0.14);
+    transition: width 600ms cubic-bezier(.2,.9,.2,1);
+  }
+  .percent{display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-top:8px}
+
+  /* small circular timers */
+  .circles{display:flex; gap:10px; align-items:center; justify-content:space-between}
+  .circle{
+    width:82px; height:82px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    box-shadow: inset 0 -6px 18px rgba(0,0,0,0.25);
+  }
+  .circle .cnum{font-size:20px; font-weight:700}
+  .circle .clbl{font-size:11px; color:var(--muted); margin-top:4px; text-transform:uppercase}
+
+  /* responsive */
+  @media (max-width:860px){
+    .card{grid-template-columns:1fr; padding:18px}
+    .right{order:2}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" role="region" aria-label="Sezon sayaçı">
+    <div class="left">
+      <h1>Sezon Bitiş Sayaçı</h1>
+      <p class="lead">Hedef: <strong>2025-10-20 23:59</strong> (yerel saate göre)</p>
+      <div class="target" id="targetInfo">Hedef zaman yükleniyor...</div>
+
+      <div class="big-count" aria-live="polite">
+        <div class="time-block"><div class="num" id="days">0</div><div class="lbl">Gün</div></div>
+        <div class="time-block"><div class="num" id="hours">0</div><div class="lbl">Saat</div></div>
+        <div class="time-block"><div class="num" id="minutes">0</div><div class="lbl">Dakika</div></div>
+        <div class="time-block"><div class="num" id="seconds">0</div><div class="lbl">Saniye</div></div>
+      </div>
+
+      <div class="subline" id="statusLine">Sayaç aktif...</div>
+    </div>
+
+    <div class="right">
+      <div class="clock">
+        <div>
+          <div class="digital" id="localClock">—:—:—</div>
+          <div class="small-muted">Şu anki yerel saat</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700" id="leftTime">— saat</div>
+          <div class="small-muted">Sezon kapanana kadar</div>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="small-muted">Sezon ilerleme göstergesi</div>
+        <div class="progress" aria-hidden="true">
+          <i id="progressFill"></i>
+        </div>
+        <div class="percent"><span id="percentText">0%</span><span id="progressETA">Kalan: —</span></div>
+      </div>
+
+      <div class="circles" style="margin-top:6px">
+        <div class="circle"><div class="cnum" id="cDays">0</div><div class="clbl">Gün</div></div>
+        <div class="circle"><div class="cnum" id="cHours">0</div><div class="clbl">Saat</div></div>
+        <div class="circle"><div class="cnum" id="cMins">0</div><div class="clbl">Dakika</div></div>
+        <div class="circle"><div class="cnum" id="cSecs">0</div><div class="clbl">Saniye</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Ayarlar ---------- */
+/* Hedef tarih: 2025-10-20 23:59 yerel zaman.
+   Bunu ISO formatında yazıyoruz (Yıl-Ay-Gün T Saat:Dakika: Saniye).
+   Eğer UTC ile oynamak istersen, Date(...) oluştururken 'Z' ekleyebilirsin. */
+const TARGET = new Date(2025, 9, 20, 23, 59, 0); // ay 0-index: 9 = Ekim
+
+/* ---------- Yardımcı fonksiyonlar ---------- */
+const pad = n => String(n).padStart(2,'0');
+
+function plural(n, forms){
+  // minimal: forms = ['gün','günler'] vs. unused — basitçe
+  return n + ' ' + forms;
+}
+
+/* ---------- DOM elemanları ---------- */
+const daysEl = document.getElementById('days');
+const hoursEl = document.getElementById('hours');
+const minsEl = document.getElementById('minutes');
+const secsEl = document.getElementById('seconds');
+const statusLine = document.getElementById('statusLine');
+const targetInfo = document.getElementById('targetInfo');
+const localClock = document.getElementById('localClock');
+const leftTime = document.getElementById('leftTime');
+const progressFill = document.getElementById('progressFill');
+const percentText = document.getElementById('percentText');
+const progressETA = document.getElementById('progressETA');
+const cDays = document.getElementById('cDays');
+const cHours = document.getElementById('cHours');
+const cMins = document.getElementById('cMins');
+const cSecs = document.getElementById('cSecs');
+
+/* Hedef bilgisini göster (kullanıcının yerel formatına göre) */
+targetInfo.textContent = `Bitiş: ${TARGET.toLocaleString()} (yerel saat)`;
+
+function updateOnce(){
+  const now = new Date();
+  const diffMs = TARGET - now;
+
+  // realtime local clock
+  localClock.textContent = now.toLocaleTimeString();
+
+  if (diffMs <= 0){
+    // bitmiş
+    daysEl.textContent = '00';
+    hoursEl.textContent = '00';
+    minsEl.textContent = '00';
+    secsEl.textContent = '00';
+    statusLine.textContent = 'Sezon sona erdi.';
+    progressFill.style.width = '100%';
+    percentText.textContent = '100%';
+    progressETA.textContent = 'Kapanış tamamlandı';
+    leftTime.textContent = '0 saat';
+    cDays.textContent = '0'; cHours.textContent='0'; cMins.textContent='0'; cSecs.textContent='0';
+    return;
+  }
+
+  // zaman hesaplama
+  let s = Math.floor(diffMs / 1000);
+  const days = Math.floor(s / 86400); s -= days * 86400;
+  const hours = Math.floor(s / 3600); s -= hours * 3600;
+  const minutes = Math.floor(s / 60); s -= minutes * 60;
+  const seconds = s;
+
+  daysEl.textContent = pad(days);
+  hoursEl.textContent = pad(hours);
+  minsEl.textContent = pad(minutes);
+  secsEl.textContent = pad(seconds);
+
+  cDays.textContent = days;
+  cHours.textContent = hours;
+  cMins.textContent = minutes;
+  cSecs.textContent = seconds;
+
+  // kalan saat metni (ör: "11 saat 23 dk")
+  const remHoursTotal = Math.floor((TARGET - now) / (1000*60*60));
+  leftTime.textContent = `${remHoursTotal} saat`;
+
+  // progress (ne kadarı geçmiş? sezon başlangıcı olarak bugünün 2025-08-19 örneğini alalım)
+  // daha gerçekçi göstermek için sezon başlangıcını sabit al (görselde 2025.08.19)
+  const START = new Date(2025,7,19,0,0,0); // 2025-08-19 00:00
+  const totalSpan = TARGET - START;
+  const passed = now - START;
+  let pct = Math.max(0, Math.min(100, Math.round((passed/totalSpan)*100)));
+  percentText.textContent = pct + '%';
+  progressFill.style.width = pct + '%';
+  progressETA.textContent = `Kalan: ${days}g ${pad(hours)}s ${pad(minutes)}d`;
+
+  statusLine.textContent = `Hedefe ${days} gün ${hours} saat ${minutes} dakika ${seconds} saniye kaldı.`;
+}
+
+/* Küçük animasyon loop: her 250ms güncelle */
+updateOnce();
+const interval = setInterval(updateOnce, 250);
+
+/* accessibility: duyuruları zaman zaman güncelle */
+setInterval(()=> {
+  // eğer bitmemişse, title'ı güncelle
+  const now = new Date();
+  if (TARGET - now > 0) {
+    document.title = `Sezon kapanıyor: ${document.getElementById('days').textContent}d ${document.getElementById('hours').textContent}h`;
+  } else {
+    document.title = `Sezon sona erdi`;
+    clearInterval(interval);
+  }
+}, 1500);
+</script>
+</body>
+</html>
