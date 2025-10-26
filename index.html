@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Sezon Sayaçı — 2025-10-20 23:59</title>
+<title>güncelleme Sayaçı</title>
 <style>
   :root{
     --bg:#0f0f14;
@@ -96,8 +96,8 @@
 <div class="wrap">
   <div class="card" role="region" aria-label="Sezon sayaçı">
     <div class="left">
-      <h1>Sezon Bitiş Sayaçı</h1>
-      <p class="lead">Hedef: <strong>2025-10-20 23:59</strong> (yerel saate göre)</p>
+      <h1>güncelleme çıkış Sayaçı</h1>
+      <p class="lead">Hedef: <strong>2025-10-26 15:31</strong> (yerel saate göre)</p>
       <div class="target" id="targetInfo">Hedef zaman yükleniyor...</div>
 
       <div class="big-count" aria-live="polite">
@@ -145,7 +145,7 @@
 /* Hedef tarih: 2025-10-20 23:59 yerel zaman.
    Bunu ISO formatında yazıyoruz (Yıl-Ay-Gün T Saat:Dakika: Saniye).
    Eğer UTC ile oynamak istersen, Date(...) oluştururken 'Z' ekleyebilirsin. */
-const TARGET = new Date(2025, 9, 20, 23, 59, 0); // ay 0-index: 9 = Ekim
+const TARGET = new Date(2025, 26, 20, 15, 31, 0); // ay 0-index: 9 = Ekim
 
 /* ---------- Yardımcı fonksiyonlar ---------- */
 const pad = n => String(n).padStart(2,'0');
@@ -188,10 +188,10 @@ function updateOnce(){
     hoursEl.textContent = '00';
     minsEl.textContent = '00';
     secsEl.textContent = '00';
-    statusLine.textContent = 'Sezon sona erdi.';
+    statusLine.textContent = 'güncelleme  geldi.';
     progressFill.style.width = '100%';
     percentText.textContent = '100%';
-    progressETA.textContent = 'Kapanış tamamlandı';
+    progressETA.textContent = 'güncelleme tamamlandı';
     leftTime.textContent = '0 saat';
     cDays.textContent = '0'; cHours.textContent='0'; cMins.textContent='0'; cSecs.textContent='0';
     return;
@@ -220,7 +220,7 @@ function updateOnce(){
 
   // progress (ne kadarı geçmiş? sezon başlangıcı olarak bugünün 2025-08-19 örneğini alalım)
   // daha gerçekçi göstermek için sezon başlangıcını sabit al (görselde 2025.08.19)
-  const START = new Date(2025,7,19,0,0,0); // 2025-08-19 00:00
+  const START = new Date(2025, 26, 20, 0, 0, 0); // 2025-08-19 00:00
   const totalSpan = TARGET - START;
   const passed = now - START;
   let pct = Math.max(0, Math.min(100, Math.round((passed/totalSpan)*100)));
@@ -240,9 +240,9 @@ setInterval(()=> {
   // eğer bitmemişse, title'ı güncelle
   const now = new Date();
   if (TARGET - now > 0) {
-    document.title = `Sezon kapanıyor: ${document.getElementById('days').textContent}d ${document.getElementById('hours').textContent}h`;
+    document.title = `Güncelleme yaklaşıyor: ${document.getElementById('days').textContent}d ${document.getElementById('hours').textContent}h`;
   } else {
-    document.title = `Sezon sona erdi`;
+    document.title = `Güncelleme geldi`;
     clearInterval(interval);
   }
 }, 1500);
