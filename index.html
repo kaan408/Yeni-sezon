@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>güncelleme Sayaçı</title>
+<title>Güncelleme Sayaçı</title>
 <style>
   :root{
     --bg:#0f0f14;
@@ -94,10 +94,10 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="card" role="region" aria-label="Sezon sayaçı">
+  <div class="card" role="region" aria-label="Güncelleme sayaçı">
     <div class="left">
-      <h1>güncelleme çıkış Sayaçı</h1>
-      <p class="lead">Hedef: <strong>2025-10-26 15:31</strong> (yerel saate göre)</p>
+      <h1>Güncelleme Sayaçı</h1>
+      <p class="lead">Hedef: <strong>26 Ekim 2025 15:31</strong> (Türkiye saati)</p>
       <div class="target" id="targetInfo">Hedef zaman yükleniyor...</div>
 
       <div class="big-count" aria-live="polite">
@@ -118,12 +118,12 @@
         </div>
         <div style="text-align:right">
           <div style="font-weight:700" id="leftTime">— saat</div>
-          <div class="small-muted">Sezon kapanana kadar</div>
+          <div class="small-muted">Güncellemeye kadar</div>
         </div>
       </div>
 
       <div class="progress-wrap">
-        <div class="small-muted">Sezon ilerleme göstergesi</div>
+        <div class="small-muted">Güncelleme ilerlemesi</div>
         <div class="progress" aria-hidden="true">
           <i id="progressFill"></i>
         </div>
@@ -142,18 +142,13 @@
 
 <script>
 /* ---------- Ayarlar ---------- */
-/* Hedef tarih: 2025-10-20 23:59 yerel zaman.
-   Bunu ISO formatında yazıyoruz (Yıl-Ay-Gün T Saat:Dakika: Saniye).
-   Eğer UTC ile oynamak istersen, Date(...) oluştururken 'Z' ekleyebilirsin. */
-const TARGET = new Date(2025, 26, 20, 15, 31, 0); // ay 0-index: 9 = Ekim
+// Hedef tarih ve başlangıç tarihi Türkiye saatine (UTC+3) göre ayarlandı.
+// Bu format, sayacın herkes için aynı zamanı göstermesini sağlar.
+const TARGET = new Date('2025-10-26T15:31:00+03:00'); // Bitiş zamanı
+const START = new Date('2025-10-26T00:00:00+03:00'); // Başlangıç zamanı (ilerleme çubuğu için)
 
 /* ---------- Yardımcı fonksiyonlar ---------- */
 const pad = n => String(n).padStart(2,'0');
-
-function plural(n, forms){
-  // minimal: forms = ['gün','günler'] vs. unused — basitçe
-  return n + ' ' + forms;
-}
 
 /* ---------- DOM elemanları ---------- */
 const daysEl = document.getElementById('days');
@@ -173,7 +168,7 @@ const cMins = document.getElementById('cMins');
 const cSecs = document.getElementById('cSecs');
 
 /* Hedef bilgisini göster (kullanıcının yerel formatına göre) */
-targetInfo.textContent = `Bitiş: ${TARGET.toLocaleString()} (yerel saat)`;
+targetInfo.textContent = `Bitiş: ${TARGET.toLocaleString()} (Türkiye saati baz alınmıştır)`;
 
 function updateOnce(){
   const now = new Date();
@@ -188,10 +183,10 @@ function updateOnce(){
     hoursEl.textContent = '00';
     minsEl.textContent = '00';
     secsEl.textContent = '00';
-    statusLine.textContent = 'güncelleme  geldi.';
+    statusLine.textContent = 'Güncelleme geldi!';
     progressFill.style.width = '100%';
     percentText.textContent = '100%';
-    progressETA.textContent = 'güncelleme tamamlandı';
+    progressETA.textContent = 'Güncelleme tamamlandı';
     leftTime.textContent = '0 saat';
     cDays.textContent = '0'; cHours.textContent='0'; cMins.textContent='0'; cSecs.textContent='0';
     return;
@@ -218,13 +213,11 @@ function updateOnce(){
   const remHoursTotal = Math.floor((TARGET - now) / (1000*60*60));
   leftTime.textContent = `${remHoursTotal} saat`;
 
-  // progress (ne kadarı geçmiş? sezon başlangıcı olarak bugünün 2025-08-19 örneğini alalım)
-  // daha gerçekçi göstermek için sezon başlangıcını sabit al (görselde 2025.08.19)
-  const START = new Date(2025, 26, 20, 0, 0, 0); // 2025-08-19 00:00
+  // progress (ne kadarı geçmiş?)
   const totalSpan = TARGET - START;
   const passed = now - START;
-  let pct = Math.max(0, Math.min(100, Math.round((passed/totalSpan)*100)));
-  percentText.textContent = pct + '%';
+  let pct = Math.max(0, Math.min(100, (passed/totalSpan)*100));
+  percentText.textContent = pct.toFixed(0) + '%';
   progressFill.style.width = pct + '%';
   progressETA.textContent = `Kalan: ${days}g ${pad(hours)}s ${pad(minutes)}d`;
 
@@ -240,7 +233,7 @@ setInterval(()=> {
   // eğer bitmemişse, title'ı güncelle
   const now = new Date();
   if (TARGET - now > 0) {
-    document.title = `Güncelleme yaklaşıyor: ${document.getElementById('days').textContent}d ${document.getElementById('hours').textContent}h`;
+    document.title = `Güncelleme yaklaşıyor: ${document.getElementById('days').textContent}g ${document.getElementById('hours').textContent}s`;
   } else {
     document.title = `Güncelleme geldi`;
     clearInterval(interval);
