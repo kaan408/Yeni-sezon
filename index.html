@@ -129,12 +129,15 @@
         </div>
         <div class="percent"><span id="percentText">0%</span><span id="progressETA">Kalan: —</span></div>
       </div>
-
-      <div class="circles" style="margin-top:6px">
-        <div class="circle"><div class="cnum" id="cDays">0</div><div class="clbl">Gün</div></div>
-        <div class="circle"><div class="cnum" id="cHours">0</div><div class="clbl">Saat</div></div>
-        <div class="circle"><div class="cnum" id="cMins">0</div><div class="clbl">Dakika</div></div>
-        <div class="circle"><div class="cnum" id="cSecs">0</div><div class="clbl">Saniye</div></div>
+      
+      <div style="margin-top:6px;">
+        <div class="small-muted" id="abuseTitle" style="margin-bottom: 8px;">Admin Abuse başlamasına kalan süre:</div>
+        <div class="circles">
+          <div class="circle"><div class="cnum" id="cDays">0</div><div class="clbl">Gün</div></div>
+          <div class="circle"><div class="cnum" id="cHours">0</div><div class="clbl">Saat</div></div>
+          <div class="circle"><div class="cnum" id="cMins">0</div><div class="clbl">Dakika</div></div>
+          <div class="circle"><div class="cnum" id="cSecs">0</div><div class="clbl">Saniye</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -142,101 +145,123 @@
 
 <script>
 /* ---------- Ayarlar ---------- */
-// Hedef tarih ve başlangıç tarihi Türkiye saatine (UTC+3) göre ayarlandı.
-// Bu format, sayacın herkes için aynı zamanı göstermesini sağlar.
-const TARGET = new Date('2025-10-26T15:31:00+03:00'); // Bitiş zamanı
-const START = new Date('2025-10-26T00:00:00+03:00'); // Başlangıç zamanı (ilerleme çubuğu için)
+// Hedef tarihler Türkiye saatine (UTC+3) göre ayarlandı.
+const TARGET_UPDATE = new Date('2025-10-26T15:31:00+03:00'); // Ana sayaç hedefi
+const TARGET_ABUSE = new Date('2025-10-26T14:31:00+03:00'); // Küçük sayaç hedefi
+const START_PROGRESS = new Date('2025-10-26T00:00:00+03:00'); // İlerleme çubuğu başlangıcı
 
-/* ---------- Yardımcı fonksiyonlar ---------- */
+/* ---------- Yardımcı Fonksiyon ---------- */
 const pad = n => String(n).padStart(2,'0');
 
-/* ---------- DOM elemanları ---------- */
+/* ---------- DOM Elemanları ---------- */
+// Ana Sayaç
 const daysEl = document.getElementById('days');
 const hoursEl = document.getElementById('hours');
 const minsEl = document.getElementById('minutes');
 const secsEl = document.getElementById('seconds');
 const statusLine = document.getElementById('statusLine');
 const targetInfo = document.getElementById('targetInfo');
-const localClock = document.getElementById('localClock');
 const leftTime = document.getElementById('leftTime');
-const progressFill = document.getElementById('progressFill');
-const percentText = document.getElementById('percentText');
-const progressETA = document.getElementById('progressETA');
+// Admin Abuse Sayaçı (Daireler)
 const cDays = document.getElementById('cDays');
 const cHours = document.getElementById('cHours');
 const cMins = document.getElementById('cMins');
 const cSecs = document.getElementById('cSecs');
+const abuseTitle = document.getElementById('abuseTitle');
+// Ortak ve Diğerleri
+const localClock = document.getElementById('localClock');
+const progressFill = document.getElementById('progressFill');
+const percentText = document.getElementById('percentText');
+const progressETA = document.getElementById('progressETA');
 
-/* Hedef bilgisini göster (kullanıcının yerel formatına göre) */
-targetInfo.textContent = `Bitiş: ${TARGET.toLocaleString()} (Türkiye saati baz alınmıştır)`;
+/* Hedef bilgisini göster */
+targetInfo.textContent = `Bitiş: ${TARGET_UPDATE.toLocaleString()} (Türkiye saati baz alınmıştır)`;
 
 function updateOnce(){
   const now = new Date();
-  const diffMs = TARGET - now;
+  
+  // --- ANA GÜNCELLEME SAYACINI YÖNET ---
+  const diffMs_update = TARGET_UPDATE - now;
 
-  // realtime local clock
-  localClock.textContent = now.toLocaleTimeString();
-
-  if (diffMs <= 0){
-    // bitmiş
+  if (diffMs_update <= 0) {
     daysEl.textContent = '00';
     hoursEl.textContent = '00';
     minsEl.textContent = '00';
     secsEl.textContent = '00';
     statusLine.textContent = 'Güncelleme geldi!';
-    progressFill.style.width = '100%';
-    percentText.textContent = '100%';
-    progressETA.textContent = 'Güncelleme tamamlandı';
-    leftTime.textContent = '0 saat';
-    cDays.textContent = '0'; cHours.textContent='0'; cMins.textContent='0'; cSecs.textContent='0';
-    return;
+  } else {
+    let s = Math.floor(diffMs_update / 1000);
+    const days = Math.floor(s / 86400); s -= days * 86400;
+    const hours = Math.floor(s / 3600); s -= hours * 3600;
+    const minutes = Math.floor(s / 60); s -= minutes * 60;
+    const seconds = s;
+    
+    daysEl.textContent = pad(days);
+    hoursEl.textContent = pad(hours);
+    minsEl.textContent = pad(minutes);
+    secsEl.textContent = pad(seconds);
+    statusLine.textContent = `Hedefe ${days} gün ${hours} saat ${minutes} dakika ${seconds} saniye kaldı.`;
   }
+  
+  // --- ADMIN ABUSE SAYACINI YÖNET (DAİRELER) ---
+  const diffMs_abuse = TARGET_ABUSE - now;
+  
+  if (diffMs_abuse <= 0) {
+    abuseTitle.textContent = "Admin Abuse başladı!";
+    cDays.textContent = '0'; 
+    cHours.textContent = '0';
+    cMins.textContent = '0';
+    cSecs.textContent = '0';
+  } else {
+    let s = Math.floor(diffMs_abuse / 1000);
+    const days = Math.floor(s / 86400); s -= days * 86400;
+    const hours = Math.floor(s / 3600); s -= hours * 3600;
+    const minutes = Math.floor(s / 60); s -= minutes * 60;
+    const seconds = s;
 
-  // zaman hesaplama
-  let s = Math.floor(diffMs / 1000);
-  const days = Math.floor(s / 86400); s -= days * 86400;
-  const hours = Math.floor(s / 3600); s -= hours * 3600;
-  const minutes = Math.floor(s / 60); s -= minutes * 60;
-  const seconds = s;
-
-  daysEl.textContent = pad(days);
-  hoursEl.textContent = pad(hours);
-  minsEl.textContent = pad(minutes);
-  secsEl.textContent = pad(seconds);
-
-  cDays.textContent = days;
-  cHours.textContent = hours;
-  cMins.textContent = minutes;
-  cSecs.textContent = seconds;
-
-  // kalan saat metni (ör: "11 saat 23 dk")
-  const remHoursTotal = Math.floor((TARGET - now) / (1000*60*60));
-  leftTime.textContent = `${remHoursTotal} saat`;
-
-  // progress (ne kadarı geçmiş?)
-  const totalSpan = TARGET - START;
-  const passed = now - START;
+    cDays.textContent = days;
+    cHours.textContent = hours;
+    cMins.textContent = minutes;
+    cSecs.textContent = seconds;
+  }
+  
+  // --- ORTAK ELEMENTLERİ GÜNCELLE ---
+  localClock.textContent = now.toLocaleTimeString();
+  
+  // Kalan saat (Ana sayaca göre)
+  const remHoursTotal = Math.floor(diffMs_update / (1000*60*60));
+  leftTime.textContent = diffMs_update > 0 ? `${remHoursTotal} saat` : '0 saat';
+  
+  // İlerleme çubuğu (Ana sayaca göre)
+  const totalSpan = TARGET_UPDATE - START_PROGRESS;
+  const passed = now - START_PROGRESS;
   let pct = Math.max(0, Math.min(100, (passed/totalSpan)*100));
   percentText.textContent = pct.toFixed(0) + '%';
   progressFill.style.width = pct + '%';
-  progressETA.textContent = `Kalan: ${days}g ${pad(hours)}s ${pad(minutes)}d`;
 
-  statusLine.textContent = `Hedefe ${days} gün ${hours} saat ${minutes} dakika ${seconds} saniye kaldı.`;
+  if (diffMs_update <= 0) {
+    progressFill.style.width = '100%';
+    percentText.textContent = '100%';
+    progressETA.textContent = 'Güncelleme tamamlandı';
+  } else {
+    const days = Math.floor(diffMs_update / (1000*86400));
+    const hours = Math.floor((diffMs_update % (1000*86400)) / (1000*3600));
+    const minutes = Math.floor((diffMs_update % (1000*3600)) / (1000*60));
+    progressETA.textContent = `Kalan: ${days}g ${pad(hours)}s ${pad(minutes)}d`;
+  }
 }
 
-/* Küçük animasyon loop: her 250ms güncelle */
+/* Ana döngüyü başlat */
 updateOnce();
 const interval = setInterval(updateOnce, 250);
 
-/* accessibility: duyuruları zaman zaman güncelle */
+/* Sayfa başlığını güncelle (sadece ana sayacı takip eder) */
 setInterval(()=> {
-  // eğer bitmemişse, title'ı güncelle
   const now = new Date();
-  if (TARGET - now > 0) {
-    document.title = `Güncelleme yaklaşıyor: ${document.getElementById('days').textContent}g ${document.getElementById('hours').textContent}s`;
+  if (TARGET_UPDATE - now > 0) {
+    document.title = `Güncelleme yaklaşıyor: ${daysEl.textContent}g ${hoursEl.textContent}s`;
   } else {
     document.title = `Güncelleme geldi`;
-    clearInterval(interval);
   }
 }, 1500);
 </script>
